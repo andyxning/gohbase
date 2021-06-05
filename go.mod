@@ -1,4 +1,4 @@
-module github.com/andyxning/gohbase
+module github.com/tsuna/gohbase
 
 go 1.13
 
