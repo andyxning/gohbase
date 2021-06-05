@@ -205,7 +205,10 @@ func CompressionCodec(codec string) Option {
 // Close closes connections to hbase master and regionservers
 func (c *client) Close() {
 	c.closeOnce.Do(func() {
-		close(c.done)
+		if c.clientType != region.MasterClient {
+			close(c.done)
+		}
+
 		if c.clientType == region.MasterClient {
 			if ac := c.adminRegionInfo.Client(); ac != nil {
 				ac.Close()
