@@ -30,7 +30,7 @@ func NewQuotaStatesRequest() *QuotaStatesRequest {
 
 // Name returns the name of the rpc function
 func (qs *QuotaStatesRequest) Name() string {
-	return "GetQuotaStatesRequest"
+	return "GetQuotaStates"
 }
 
 // ToProto returns the Protobuf message to be sent

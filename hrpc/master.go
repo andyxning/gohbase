@@ -46,7 +46,7 @@ func NewSetNamespaceSpaceQuotaRequest(ctx context.Context, namespace string, quo
 
 // Name returns the name of this RPC call.
 func (nsqr *SetNamespaceSpaceQuotaRequest) Name() string {
-	return "SetQuotaRequest"
+	return "SetQuota"
 }
 
 // ToProto converts the RPC into a protobuf message.
