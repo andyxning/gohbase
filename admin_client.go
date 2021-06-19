@@ -35,6 +35,7 @@ type AdminClient interface {
 	ListSnapshots(t *hrpc.ListSnapshots) ([]*pb.SnapshotDescription, error)
 	RestoreSnapshot(t *hrpc.Snapshot) error
 	ClusterStatus() (*pb.ClusterStatus, error)
+	GetQuotaStates() (*pb.GetQuotaStatesResponse, error)
 	ListTableNames(t *hrpc.ListTableNames) ([]*pb.TableName, error)
 	// SetBalancer sets balancer state and returns previous state
 	SetBalancer(sb *hrpc.SetBalancer) (bool, error)
@@ -86,6 +87,20 @@ func (c *client) ClusterStatus() (*pb.ClusterStatus, error) {
 	}
 
 	return r.GetClusterStatus(), nil
+}
+
+func (c *client) GetQuotaStates() (*pb.GetQuotaStatesResponse, error) {
+	pbmsg, err := c.SendRPC(hrpc.NewQuotaStatesRequest())
+	if err != nil {
+		return nil, err
+	}
+
+	r, ok := pbmsg.(*pb.GetQuotaStatesResponse)
+	if !ok {
+		return nil, fmt.Errorf("sendRPC returned not a GetQuotaStatesResponse")
+	}
+
+	return r, nil
 }
 
 func (c *client) CreateTable(t *hrpc.CreateTable) error {
