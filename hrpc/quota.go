@@ -12,7 +12,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// QuotaStatesRequest to represent a get quota states request
+// QuotaStatesRequest represents a get quota states request
 type QuotaStatesRequest struct {
 	base
 }
