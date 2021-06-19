@@ -40,6 +40,8 @@ type AdminClient interface {
 	SetBalancer(sb *hrpc.SetBalancer) (bool, error)
 	// MoveRegion moves a region to a different RegionServer
 	MoveRegion(mr *hrpc.MoveRegion) error
+	// SetNamespaceSpaceQuota sets namespace space quota
+	SetNamespaceSpaceQuota(nsqr *hrpc.SetNamespaceSpaceQuotaRequest) error
 }
 
 // NewAdminClient creates an admin HBase client.
@@ -294,5 +296,19 @@ func (c *client) MoveRegion(mr *hrpc.MoveRegion) error {
 	if !ok {
 		return errors.New("SendPRC returned not a MoveRegionResponse")
 	}
+	return nil
+}
+
+func (c *client) SetNamespaceSpaceQuota(nsqr *hrpc.SetNamespaceSpaceQuotaRequest) error {
+	pbmsg, err := c.SendRPC(nsqr)
+	if err != nil {
+		return err
+	}
+
+	_, ok := pbmsg.(*pb.SetQuotaResponse)
+	if !ok {
+		return fmt.Errorf("sendRPC returned not a SetQuotaResponse")
+	}
+
 	return nil
 }
