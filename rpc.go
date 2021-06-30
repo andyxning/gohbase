@@ -243,9 +243,10 @@ func (c *client) lookupRegion(ctx context.Context,
 			"err":     err,
 		}).Error("failed looking up region")
 
+		var backoffErr error
 		// This will be hit if there was an error locating the region
-		backoff, err = sleepAndIncreaseBackoff(ctx, backoff)
-		if err != nil {
+		backoff, backoffErr = sleepAndIncreaseBackoff(ctx, backoff)
+		if backoffErr != nil {
 			return nil, "", err
 		}
 	}
