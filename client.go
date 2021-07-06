@@ -22,11 +22,13 @@ import (
 )
 
 const (
-	defaultRPCQueueSize  = 100
-	defaultFlushInterval = 20 * time.Millisecond
-	defaultZkRoot        = "/hbase"
-	defaultZkTimeout     = 30 * time.Second
-	defaultEffectiveUser = "root"
+	defaultRPCQueueSize            = 100
+	defaultFlushInterval           = 20 * time.Millisecond
+	defaultZkRoot                  = "/hbase"
+	defaultZkTimeout               = 30 * time.Second
+	defaultEffectiveUser           = "root"
+	defaultZkMetaRegionServerZNode = "meta-region-server"
+	defaultZkMasterZNode           = "master"
 )
 
 // Client a regular HBase client
@@ -71,7 +73,9 @@ type client struct {
 	zkClient zk.Client
 
 	// The root zookeeper path for Hbase. By default, this is usually "/hbase".
-	zkRoot string
+	zkRoot                  string
+	zkMetaRegionServerZNode string
+	zkMasterZNode           string
 
 	// The zookeeper session timeout
 	zkTimeout time.Duration
@@ -123,13 +127,15 @@ func newClient(zkquorum string, options ...Option) *client {
 			[]byte("hbase:meta,,1"),
 			nil,
 			nil),
-		zkRoot:              defaultZkRoot,
-		zkTimeout:           defaultZkTimeout,
-		effectiveUser:       defaultEffectiveUser,
-		regionLookupTimeout: region.DefaultLookupTimeout,
-		regionReadTimeout:   region.DefaultReadTimeout,
-		done:                make(chan struct{}),
-		newRegionClientFn:   region.NewClient,
+		zkRoot:                  defaultZkRoot,
+		zkMetaRegionServerZNode: defaultZkMetaRegionServerZNode,
+		zkMasterZNode:           defaultZkMasterZNode,
+		zkTimeout:               defaultZkTimeout,
+		effectiveUser:           defaultEffectiveUser,
+		regionLookupTimeout:     region.DefaultLookupTimeout,
+		regionReadTimeout:       region.DefaultReadTimeout,
+		done:                    make(chan struct{}),
+		newRegionClientFn:       region.NewClient,
 	}
 	for _, option := range options {
 		option(c)
@@ -137,7 +143,7 @@ func newClient(zkquorum string, options ...Option) *client {
 
 	//Have to create the zkClient after the Options have been set
 	//since the zkTimeout could be changed as an option
-	c.zkClient = zk.NewClient(zkquorum, c.zkTimeout)
+	c.zkClient = zk.NewClient(zkquorum, c.zkTimeout, c.zkRoot, c.zkMetaRegionServerZNode, c.zkMasterZNode)
 
 	return c
 }
@@ -147,6 +153,20 @@ func newClient(zkquorum string, options ...Option) *client {
 func RpcQueueSize(size int) Option {
 	return func(c *client) {
 		c.rpcQueueSize = size
+	}
+}
+
+// ZookeeperMetaRegionServerZNode will return an option that will set the zookeeper meta region server znode used in a given client.
+func ZookeeperMetaRegionServerZNode(metaRegionServerZNode string) Option {
+	return func(c *client) {
+		c.zkMetaRegionServerZNode = metaRegionServerZNode
+	}
+}
+
+// ZookeeperMasterZNode will return an option that will set the zookeeper master znode used in a given client.
+func ZookeeperMasterZNode(masterZNode string) Option {
+	return func(c *client) {
+		c.zkMasterZNode = masterZNode
 	}
 }
 

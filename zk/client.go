@@ -44,10 +44,6 @@ const (
 	// Meta is a ResourceName that indicates that the location of the Meta
 	// table is what will be fetched
 	Meta = ResourceName("/meta-region-server")
-
-	// Master is a ResourceName that indicates that the location of the Master
-	// server is what will be fetched
-	Master = ResourceName("/master")
 )
 
 // Client is an interface of client that retrieves meta infomation from zookeeper
@@ -58,13 +54,21 @@ type Client interface {
 type client struct {
 	zks            []string
 	sessionTimeout time.Duration
+
+	zkRoot                  string
+	zkMetaRegionServerZNode string
+	zkMasterZNode           string
 }
 
 // NewClient establishes connection to zookeeper and returns the client
-func NewClient(zkquorum string, st time.Duration) Client {
+func NewClient(zkquorum string, st time.Duration, zkRoot, zkMetaRegionServerZNode, zkMasterZNode string) Client {
 	return &client{
 		zks:            strings.Split(zkquorum, ","),
 		sessionTimeout: st,
+
+		zkRoot:                  zkRoot,
+		zkMetaRegionServerZNode: zkMetaRegionServerZNode,
+		zkMasterZNode:           zkMasterZNode,
 	}
 }
 
@@ -97,7 +101,7 @@ func (c *client) LocateResource(resource ResourceName) (string, error) {
 	}
 	buf = buf[4:]
 	var server *pb.ServerName
-	if resource == Meta {
+	if resource == ResourceName(c.zkMetaRegionServerZNode).Prepend(c.zkRoot) {
 		meta := &pb.MetaRegionServer{}
 		err = proto.Unmarshal(buf, meta)
 		if err != nil {
