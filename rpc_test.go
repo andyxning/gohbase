@@ -61,7 +61,7 @@ func TestSendRPCSanity(t *testing.T) {
 	defer ctrl.Finish()
 	// we expect to ask zookeeper for where metaregion is
 	zkClient := mockZk.NewMockClient(ctrl)
-	zkClient.EXPECT().LocateResource(zk.Meta).Return("regionserver:1", nil).MinTimes(1)
+	zkClient.EXPECT().LocateResource(zk.ResourceName("/meta-region-server")).Return("regionserver:1", nil).MinTimes(1)
 	c := newMockClient(zkClient)
 
 	// ask for "theKey" in table "test"

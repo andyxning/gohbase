@@ -194,15 +194,15 @@ func (c *client) lookupRegion(ctx context.Context,
 		// If it takes longer than regionLookupTimeout, fail so that we can sleep
 		lookupCtx, cancel := context.WithTimeout(ctx, c.regionLookupTimeout)
 		if c.clientType == region.MasterClient {
-			log.WithField("resource", zk.Master).Debug("looking up master")
+			log.WithField("resource", zk.ResourceName(c.zkMasterZNode)).Debug("looking up master")
 
-			addr, err = c.zkLookup(lookupCtx, zk.Master)
+			addr, err = c.zkLookup(lookupCtx, zk.ResourceName(c.zkMasterZNode))
 			cancel()
 			reg = c.adminRegionInfo
 		} else if bytes.Equal(table, metaTableName) {
-			log.WithField("resource", zk.Meta).Debug("looking up region server of hbase:meta")
+			log.WithField("resource", zk.ResourceName(c.zkMetaRegionServerZNode)).Debug("looking up region server of hbase:meta")
 
-			addr, err = c.zkLookup(lookupCtx, zk.Meta)
+			addr, err = c.zkLookup(lookupCtx, zk.ResourceName(c.zkMetaRegionServerZNode))
 			cancel()
 			reg = c.metaRegionInfo
 		} else {
