@@ -35,7 +35,7 @@ type AdminClient interface {
 	ListSnapshots(t *hrpc.ListSnapshots) ([]*pb.SnapshotDescription, error)
 	RestoreSnapshot(t *hrpc.Snapshot) error
 	ClusterStatus() (*pb.ClusterStatus, error)
-	GetQuotaStates() (*pb.GetQuotaStatesResponse, error)
+	GetQuotaStates(quotaStatesReq *hrpc.QuotaStatesRequest) (*pb.GetQuotaStatesResponse, error)
 	ListTableNames(t *hrpc.ListTableNames) ([]*pb.TableName, error)
 	// SetBalancer sets balancer state and returns previous state
 	SetBalancer(sb *hrpc.SetBalancer) (bool, error)
