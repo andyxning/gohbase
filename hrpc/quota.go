@@ -18,10 +18,10 @@ type QuotaStatesRequest struct {
 }
 
 // NewQuotaStatesRequest creates a new QuotaStatesRequest with default fields
-func NewQuotaStatesRequest() *QuotaStatesRequest {
+func NewQuotaStatesRequest(ctx context.Context) *QuotaStatesRequest {
 	return &QuotaStatesRequest{
 		base{
-			ctx:      context.Background(),
+			ctx:      ctx,
 			table:    []byte{},
 			resultch: make(chan RPCResult, 1),
 		},

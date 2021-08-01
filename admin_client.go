@@ -91,8 +91,8 @@ func (c *client) ClusterStatus() (*pb.ClusterStatus, error) {
 	return r.GetClusterStatus(), nil
 }
 
-func (c *client) GetQuotaStates() (*pb.GetQuotaStatesResponse, error) {
-	pbmsg, err := c.SendRPC(hrpc.NewQuotaStatesRequest())
+func (c *client) GetQuotaStates(quotaStatesReq *hrpc.QuotaStatesRequest) (*pb.GetQuotaStatesResponse, error) {
+	pbmsg, err := c.SendRPC(quotaStatesReq)
 	if err != nil {
 		return nil, err
 	}
