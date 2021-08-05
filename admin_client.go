@@ -43,6 +43,7 @@ type AdminClient interface {
 	MoveRegion(mr *hrpc.MoveRegion) error
 	// SetNamespaceSpaceQuota sets namespace space quota
 	SetNamespaceSpaceQuota(nsqr *hrpc.SetNamespaceSpaceQuotaRequest) error
+	ListNamespaceDescriptors(t *hrpc.ListNamespaceDescriptors) ([]*pb.NamespaceDescriptor, error)
 }
 
 // NewAdminClient creates an admin HBase client.
@@ -328,4 +329,18 @@ func (c *client) SetNamespaceSpaceQuota(nsqr *hrpc.SetNamespaceSpaceQuotaRequest
 	}
 
 	return nil
+}
+
+func (c *client) ListNamespaceDescriptors(t *hrpc.ListNamespaceDescriptors) ([]*pb.NamespaceDescriptor, error) {
+	pbmsg, err := c.SendRPC(t)
+	if err != nil {
+		return nil, err
+	}
+
+	res, ok := pbmsg.(*pb.ListNamespaceDescriptorsResponse)
+	if !ok {
+		return nil, errors.New("sendPRC returned not a ListNamespaceDescriptorsResponse")
+	}
+
+	return res.GetNamespaceDescriptor(), nil
 }
