@@ -32,7 +32,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var zkQuorum string = "10.248.149.148"
+var zkQuorum string = "localhost"
 
 var host = flag.String("host", zkQuorum, "The location where HBase is running")
 
