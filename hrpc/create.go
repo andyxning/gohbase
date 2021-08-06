@@ -16,6 +16,7 @@ import (
 type CreateTable struct {
 	base
 
+	namespace string
 	families  map[string]map[string]string
 	splitKeys [][]byte
 }
@@ -46,13 +47,20 @@ func NewCreateTable(ctx context.Context, table []byte,
 			ctx:      ctx,
 			resultch: make(chan RPCResult, 1),
 		},
+		namespace: "default",
 		families: make(map[string]map[string]string, len(families)),
 	}
+
+	for family := range families {
+		ct.families[family] = make(map[string]string, len(defaultAttributes))
+	}
+
 	for _, option := range options {
 		option(ct)
 	}
-	for family, attrs := range families {
-		ct.families[family] = make(map[string]string, len(defaultAttributes))
+
+	for family, attrs := range ct.families {
+		//ct.families[family] = make(map[string]string, len(defaultAttributes))
 		for k, dv := range defaultAttributes {
 			if v, ok := attrs[k]; ok {
 				ct.families[family][k] = v
@@ -95,8 +103,7 @@ func (ct *CreateTable) ToProto() proto.Message {
 	return &pb.CreateTableRequest{
 		TableSchema: &pb.TableSchema{
 			TableName: &pb.TableName{
-				// TODO: handle namespaces
-				Namespace: []byte("default"),
+				Namespace: []byte(ct.namespace),
 				Qualifier: ct.table,
 			},
 			ColumnFamilies: pbFamilies,
@@ -109,4 +116,25 @@ func (ct *CreateTable) ToProto() proto.Message {
 // RPC.
 func (ct *CreateTable) NewResponse() proto.Message {
 	return &pb.CreateTableResponse{}
+}
+
+// SetNamespace will return an option that will set the namespace for the created table
+func SetNamespace(namespace string) func(*CreateTable) {
+	return func(ct *CreateTable) {
+		ct.namespace = namespace
+	}
+}
+
+// SetAttribute will return an option that will set the attribute for the created table
+func SetAttribute(inputAttrs map[string]string) func(*CreateTable) {
+	return func(ct *CreateTable) {
+		for family := range ct.families {
+			for k, iv := range inputAttrs {
+				if _, ok := defaultAttributes[k]; !ok {
+					continue
+				}
+				ct.families[family][k] = iv
+			}
+		}
+	}
 }
