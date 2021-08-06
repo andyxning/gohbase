@@ -204,7 +204,7 @@ func (c *client) CreateSnapshot(t *hrpc.Snapshot) error {
 
 	_, ok := pbmsg.(*pb.SnapshotResponse)
 	if !ok {
-		return errors.New("sendPRC returned not a SnapshotResponse")
+		return errors.New("sendRPC returned not a SnapshotResponse")
 	}
 
 	ticker := time.NewTicker(snaphotValidateInterval)
@@ -222,7 +222,7 @@ func (c *client) CreateSnapshot(t *hrpc.Snapshot) error {
 
 			r, ok := pbmsgs.(*pb.IsSnapshotDoneResponse)
 			if !ok {
-				return errors.New("sendPRC returned not a IsSnapshotDoneResponse")
+				return errors.New("sendRPC returned not a IsSnapshotDoneResponse")
 			}
 
 			if r.GetDone() {
@@ -244,7 +244,7 @@ func (c *client) DeleteSnapshot(t *hrpc.Snapshot) error {
 
 	_, ok := pbmsg.(*pb.DeleteSnapshotResponse)
 	if !ok {
-		return errors.New("sendPRC returned not a DeleteSnapshotResponse")
+		return errors.New("sendRPC returned not a DeleteSnapshotResponse")
 	}
 
 	return nil
@@ -258,7 +258,7 @@ func (c *client) ListSnapshots(t *hrpc.ListSnapshots) ([]*pb.SnapshotDescription
 
 	r, ok := pbmsg.(*pb.GetCompletedSnapshotsResponse)
 	if !ok {
-		return nil, errors.New("sendPRC returned not a GetCompletedSnapshotsResponse")
+		return nil, errors.New("sendRPC returned not a GetCompletedSnapshotsResponse")
 	}
 
 	return r.GetSnapshots(), nil
@@ -274,7 +274,7 @@ func (c *client) RestoreSnapshot(t *hrpc.Snapshot) error {
 
 	_, ok := pbmsg.(*pb.RestoreSnapshotResponse)
 	if !ok {
-		return errors.New("sendPRC returned not a RestoreSnapshotResponse")
+		return errors.New("sendRPC returned not a RestoreSnapshotResponse")
 	}
 	return nil
 }
@@ -287,7 +287,7 @@ func (c *client) ListTableNames(t *hrpc.ListTableNames) ([]*pb.TableName, error)
 
 	res, ok := pbmsg.(*pb.GetTableNamesResponse)
 	if !ok {
-		return nil, errors.New("sendPRC returned not a GetTableNamesResponse")
+		return nil, errors.New("sendRPC returned not a GetTableNamesResponse")
 	}
 
 	return res.GetTableNames(), nil
@@ -300,7 +300,7 @@ func (c *client) SetBalancer(sb *hrpc.SetBalancer) (bool, error) {
 	}
 	res, ok := pbmsg.(*pb.SetBalancerRunningResponse)
 	if !ok {
-		return false, errors.New("SendPRC returned not a SetBalancerRunningResponse")
+		return false, errors.New("sendRPC returned not a SetBalancerRunningResponse")
 	}
 	return res.GetPrevBalanceValue(), nil
 }
@@ -312,7 +312,7 @@ func (c *client) MoveRegion(mr *hrpc.MoveRegion) error {
 	}
 	_, ok := pbmsg.(*pb.MoveRegionResponse)
 	if !ok {
-		return errors.New("SendPRC returned not a MoveRegionResponse")
+		return errors.New("sendRPC returned not a MoveRegionResponse")
 	}
 	return nil
 }
@@ -339,7 +339,7 @@ func (c *client) ListNamespaceDescriptors(t *hrpc.ListNamespaceDescriptors) ([]*
 
 	res, ok := pbmsg.(*pb.ListNamespaceDescriptorsResponse)
 	if !ok {
-		return nil, errors.New("sendPRC returned not a ListNamespaceDescriptorsResponse")
+		return nil, errors.New("sendRPC returned not a ListNamespaceDescriptorsResponse")
 	}
 
 	return res.GetNamespaceDescriptor(), nil

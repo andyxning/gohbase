@@ -6,12 +6,12 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// ListTableNames models a ListTableNames pb call
+// ListNamespaceDescriptors models a ListNamespaceDescriptors pb call
 type ListNamespaceDescriptors struct {
 	base
 }
 
-// NewListNamespaceDescriptors creates a new GetTableNames request that will list namespaces in hbase.
+// NewListNamespaceDescriptors creates a new ListNamespaceDescriptors request that will list namespaces in hbase.
 func NewListNamespaceDescriptors(ctx context.Context, opts ...func(Call) error) (*ListNamespaceDescriptors, error) {
 	tn := &ListNamespaceDescriptors{
 		base: base{
