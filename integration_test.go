@@ -2282,3 +2282,23 @@ func TestMoveRegion(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestListNamespaceDescriptors(t *testing.T) {
+	//c := gohbase.NewClient(*host)
+	ac := gohbase.NewAdminClient(*host)
+
+	listNs, err := hrpc.NewListNamespaceDescriptors(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	names, err := ac.ListNamespaceDescriptors(listNs);
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, m := range names {
+		t.Logf("name:%s\n", string(m.Name))
+	}
+}
+
