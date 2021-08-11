@@ -15,18 +15,26 @@ import (
 // DeleteTable represents a DeleteTable HBase call
 type DeleteTable struct {
 	base
+	namespace string
 }
 
 // NewDeleteTable creates a new DeleteTable request that will delete the
 // given table in HBase. For use by the admin client.
-func NewDeleteTable(ctx context.Context, table []byte) *DeleteTable {
-	return &DeleteTable{
-		base{
+func NewDeleteTable(ctx context.Context, table []byte, options ...func(*DeleteTable)) *DeleteTable {
+	dt := &DeleteTable{
+		base: base{
 			table:    table,
 			ctx:      ctx,
 			resultch: make(chan RPCResult, 1),
 		},
+		namespace: "default",
 	}
+
+	for _, option := range options {
+		option(dt)
+	}
+
+	return dt
 }
 
 // Name returns the name of this RPC call.
@@ -38,8 +46,7 @@ func (dt *DeleteTable) Name() string {
 func (dt *DeleteTable) ToProto() proto.Message {
 	return &pb.DeleteTableRequest{
 		TableName: &pb.TableName{
-			// TODO: hadle namespaces properly
-			Namespace: []byte("default"),
+			Namespace: []byte(dt.namespace),
 			Qualifier: dt.table,
 		},
 	}
@@ -49,4 +56,10 @@ func (dt *DeleteTable) ToProto() proto.Message {
 // RPC.
 func (dt *DeleteTable) NewResponse() proto.Message {
 	return &pb.DeleteTableResponse{}
+}
+
+func SetDelNamespace(namespace string) func(*DeleteTable) {
+	return func(dt *DeleteTable) {
+		dt.namespace = namespace
+	}
 }

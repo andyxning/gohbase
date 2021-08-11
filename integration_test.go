@@ -32,8 +32,11 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var host = flag.String("host", "localhost", "The location where HBase is running")
+var zkQuorum string = "localhost"
 
+var host = flag.String("host", zkQuorum, "The location where HBase is running")
+
+var namespace string
 var table string
 
 func init() {
@@ -54,7 +57,12 @@ func CreateTable(client gohbase.AdminClient, table string, cFamilies []string) e
 
 	// pre-split table for reverse scan test of region changes
 	keySplits := [][]byte{[]byte("REVTEST-100"), []byte("REVTEST-200"), []byte("REVTEST-300")}
-	ct := hrpc.NewCreateTable(context.Background(), []byte(table), cf, hrpc.SplitKeys(keySplits))
+	attr := make(map[string]string)
+	attr["VERSIONS"] = "1"
+	namespace = "test"
+
+	ct := hrpc.NewCreateTable(context.Background(), []byte(table), cf, hrpc.SplitKeys(keySplits), hrpc.SetNamespace(namespace),
+		hrpc.SetAttribute(attr))
 	if err := client.CreateTable(ct); err != nil {
 		return err
 	}
@@ -65,7 +73,12 @@ func CreateTable(client gohbase.AdminClient, table string, cFamilies []string) e
 // DeleteTable finds the HBase shell via the HBASE_HOME environment variable,
 // and disables and drops the given table
 func DeleteTable(client gohbase.AdminClient, table string) error {
-	dit := hrpc.NewDisableTable(context.Background(), []byte(table))
+	dtns := "default"
+	if namespace != "" {
+		dtns = namespace
+	}
+
+	dit := hrpc.NewDisableTable(context.Background(), []byte(table), hrpc.SetDisNamespace(dtns))
 	err := client.DisableTable(dit)
 	if err != nil {
 		if !strings.Contains(err.Error(), "TableNotEnabledException") {
@@ -73,7 +86,7 @@ func DeleteTable(client gohbase.AdminClient, table string) error {
 		}
 	}
 
-	det := hrpc.NewDeleteTable(context.Background(), []byte(table))
+	det := hrpc.NewDeleteTable(context.Background(), []byte(table), hrpc.SetDelNamespace(dtns))
 	err = client.DeleteTable(det)
 	if err != nil {
 		return err
