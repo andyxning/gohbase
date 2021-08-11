@@ -60,11 +60,9 @@ func NewCreateTable(ctx context.Context, table []byte,
 	}
 
 	for family, attrs := range ct.families {
-		//ct.families[family] = make(map[string]string, len(defaultAttributes))
 		for k, dv := range defaultAttributes {
-			if v, ok := attrs[k]; ok {
-				ct.families[family][k] = v
-			} else {
+			if _, ok := attrs[k]; ok == false {
+				//set attribute to default if it is not set
 				ct.families[family][k] = dv
 			}
 		}
